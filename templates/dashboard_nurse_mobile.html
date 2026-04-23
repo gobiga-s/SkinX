@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nurse Dashboard - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-user-nurse"></i>
+            </div>
+            <h1>Nurse {{ user.name.split(' ')[0] }}</h1>
+            <p>Nursing Dashboard</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Patients Today</div>
+                </div>
+                <div class="stat-card secondary">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Pending Reports</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </div>
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="showUploadModal()">
+                        <i class="fas fa-upload"></i>
+                        <span>Upload Data</span>
+                    </div>
+                    <div class="quick-action" onclick="window.location.href='/analysis'">
+                        <i class="fas fa-camera"></i>
+                        <span>Capture Image</span>
+                    </div>
+                    <div class="quick-action" onclick="window.location.href='/reports'">
+                        <i class="fas fa-file-medical"></i>
+                        <span>View Reports</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Upload Section -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-user-plus"></i>
+                    Upload Patient Data
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Patient Name</label>
+                    <input type="text" class="form-input" id="patientName" placeholder="Enter patient name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Patient ID</label>
+                    <input type="text" class="form-input" id="patientId" placeholder="Enter patient ID">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-input" id="patientNotes" rows="3" placeholder="Add clinical notes..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="uploadPatientData()">
+                    <i class="fas fa-upload"></i> Upload Data
+                </button>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-history"></i>
+                    Recent Activity
+                </div>
+                <div id="recentActivity">
+                    <p style="color: var(--text-light); font-size: 0.9rem;">No recent activity</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="/dashboard" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/analysis" class="nav-item">
+                <i class="fas fa-camera"></i>
+                <span>Capture</span>
+            </a>
+            <a href="/reports" class="nav-item">
+                <i class="fas fa-file-medical"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="loading-overlay" id="uploadModal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="card" style="width: 90%; max-width: 400px;">
+            <div class="card-title">
+                <i class="fas fa-upload"></i>
+                Upload Patient Data
+            </div>
+            <div class="upload-area" id="dataUploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <p class="upload-text">Upload Patient File</p>
+                <p class="upload-hint">PDF, JPG, PNG</p>
+                <input type="file" id="dataFile" accept=".pdf,.jpg,.png" style="display: none;">
+                <button class="btn btn-primary" style="margin-top: 15px;" onclick="document.getElementById('dataFile').click()">
+                    <i class="fas fa-folder-open"></i> Choose File
+                </button>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button type="button" class="btn btn-outline" onclick="hideUploadModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="uploadFile()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NurseDashboard {
+            constructor() {
+                this.initializeEventListeners();
+                this.loadRecentActivity();
+            }
+
+            initializeEventListeners() {
+                const dataFileInput = document.getElementById('dataFile');
+                const dataUploadArea = document.getElementById('dataUploadArea');
+
+                if (dataFileInput) {
+                    dataFileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            dataUploadArea.querySelector('.upload-text').textContent = file.name;
+                        }
+                    });
+                }
+            }
+
+            async uploadPatientData() {
+                const patientName = document.getElementById('patientName').value;
+                const patientId = document.getElementById('patientId').value;
+                const notes = document.getElementById('patientNotes').value;
+
+                if (!patientName || !patientId) {
+                    this.showToast('Please fill in patient name and ID', 'error');
+                    return;
+                }
+
+                this.showToast('Patient data uploaded successfully!', 'success');
+                
+                // Clear form
+                document.getElementById('patientName').value = '';
+                document.getElementById('patientId').value = '';
+                document.getElementById('patientNotes').value = '';
+            }
+
+            showUploadModal() {
+                document.getElementById('uploadModal').style.display = 'flex';
+            }
+
+            hideUploadModal() {
+                document.getElementById('uploadModal').style.display = 'none';
+            }
+
+            uploadFile() {
+                this.showToast('File uploaded successfully!', 'success');
+                this.hideUploadModal();
+            }
+
+            async loadRecentActivity() {
+                try {
+                    const response = await fetch('/api/analyses');
+                    const data = await response.json();
+                    
+                    if (data.analyses && data.analyses.length > 0) {
+                        const activityHtml = data.analyses.slice(0, 3).map(analysis => `
+                            <div class="patient-item">
+                                <div class="patient-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <div class="patient-info">
+                                    <div class="patient-name">${analysis.disease_detected}</div>
+                                    <div class="patient-details">${new Date(analysis.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('recentActivity').innerHTML = activityHtml;
+                    }
+                } catch (error) {
+                    console.error('Failed to load recent activity:', error);
+                }
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+
+        function showUploadModal() {
+            window.nurseDashboard.showUploadModal();
+        }
+
+        function hideUploadModal() {
+            window.nurseDashboard.hideUploadModal();
+        }
+
+        function uploadPatientData() {
+            window.nurseDashboard.uploadPatientData();
+        }
+
+        function uploadFile() {
+            window.nurseDashboard.uploadFile();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.nurseDashboard = new NurseDashboard();
+        });
+    </script>
+</body>
+</html>

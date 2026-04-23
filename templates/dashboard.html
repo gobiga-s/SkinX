@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkinX Medical AI Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/modern.css') }}" rel="stylesheet">
+    
+    <style>
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--primary-500);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .stat-icon.patients {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .stat-icon.analyses {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .stat-icon.accuracy {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .stat-icon.time {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .stat-change.positive {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+        
+        .stat-change.negative {
+            background: #ffeaea;
+            color: #d32f2f;
+        }
+        
+        .recent-activity {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .activity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .activity-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .view-all-btn {
+            background: none;
+            border: 1px solid var(--primary-500);
+            color: var(--primary-500);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-all-btn:hover {
+            background: var(--primary-500);
+            color: white;
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: #e9ecef;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .activity-icon.image {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .activity-icon.text {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .activity-icon.patient {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .activity-details {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            color: inherit;
+        }
+        
+        .quick-action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 15px auto;
+        }
+        
+        .quick-action-icon.new-patient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .quick-action-icon.image-analysis {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .quick-action-icon.text-analysis {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .quick-action-icon.patients {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .quick-action-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .quick-action-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .activity-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Sidebar Navigation -->
+    <nav class="modern-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <div class="logo-text">
+                    <h3>SkinX</h3>
+                    <span class="logo-subtitle">Medical AI Platform</span>
+                </div>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <h6 class="menu-title">Main Menu</h6>
+                <ul class="nav-menu">
+                    <li class="nav-item active">
+                        <a href="#dashboard" class="nav-link">
+                            <i class="fas fa-dashboard"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#patients" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#image-analysis" class="nav-link">
+                            <i class="fas fa-image"></i>
+                            <span>Image Analysis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#text-analysis" class="nav-link">
+                            <i class="fas fa-notes-medical"></i>
+                            <span>Symptom Analysis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#history" class="nav-link">
+                            <i class="fas fa-history"></i>
+                            <span>Analysis History</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <h6 class="menu-title">Professional Tools</h6>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#analytics" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reports" class="nav-link">
+                            <i class="fas fa-file-medical"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Dr. Professional</div>
+                    <div class="user-role" id="userRole">Healthcare Provider</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navigation Bar -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="mobile-sidebar-toggle" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb-nav">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search patients, analyses..." class="search-input">
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    
+                    <div class="user-menu">
+                        <button class="user-menu-btn" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <div class="welcome-content">
+                    <h1 class="welcome-title">Welcome back, <span id="welcomeName">Doctor</span>!</h1>
+                    <p class="welcome-subtitle">Here's what's happening with your patients today</p>
+                </div>
+            </section>
+
+            <!-- Dashboard Statistics -->
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon patients">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            12%
+                        </div>
+                    </div>
+                    <div class="stat-value">247</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon analyses">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            8%
+                        </div>
+                    </div>
+                    <div class="stat-value">1,842</div>
+                    <div class="stat-label">Total Analyses</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon accuracy">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            2%
+                        </div>
+                    </div>
+                    <div class="stat-value">96.1%</div>
+                    <div class="stat-label">Accuracy Rate</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon time">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            5%
+                        </div>
+                    </div>
+                    <div class="stat-value">180ms</div>
+                    <div class="stat-label">Avg. Processing Time</div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <a href="/patients/new" class="quick-action-card">
+                    <div class="quick-action-icon new-patient">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="quick-action-title">New Patient</div>
+                    <div class="quick-action-description">Register a new patient and start tracking their history</div>
+                </a>
+                
+                <a href="/analysis/image" class="quick-action-card">
+                    <div class="quick-action-icon image-analysis">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="quick-action-title">Image Analysis</div>
+                    <div class="quick-action-description">Upload and analyze medical images with AI</div>
+                </a>
+                
+                <a href="/analysis/text" class="quick-action-card">
+                    <div class="quick-action-icon text-analysis">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <div class="quick-action-title">Symptom Analysis</div>
+                    <div class="quick-action-description">Analyze symptoms and clinical descriptions</div>
+                </a>
+                
+                <a href="/patients" class="quick-action-card">
+                    <div class="quick-action-icon patients">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="quick-action-title">View Patients</div>
+                    <div class="quick-action-description">Browse and manage patient records</div>
+                </a>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Analysis Trends</h3>
+                        <select class="form-select form-select-sm" style="width: auto;">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 3 months</option>
+                        </select>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <p>Analysis trends chart</p>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Disease Distribution</h3>
+                        <button class="btn btn-sm btn-outline-primary">Export</button>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-pie fa-3x mb-3"></i>
+                        <p>Disease distribution chart</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <div class="activity-header">
+                    <h3>Recent Activity</h3>
+                    <button class="view-all-btn" onclick="viewAllActivity()">View All</button>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Image Analysis Completed</div>
+                            <div class="activity-details">John Smith - Melanoma detected with 94.2% confidence</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon text">
+                            <i class="fas fa-notes-medical"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Symptom Analysis Completed</div>
+                            <div class="activity-details">Sarah Johnson - Eczema diagnosed with 87.5% confidence</div>
+                            <div class="activity-time">5 hours ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon patient">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">New Patient Registered</div>
+                            <div class="activity-details">Michael Brown - Added to patient database</div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Image Analysis Completed</div>
+                            <div class="activity-details">Emily Davis - Psoriasis identified with 91.8% confidence</div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

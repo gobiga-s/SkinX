@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patients - SkinX Professional Medical AI Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00a896;
+            --success-color: #28a745;
+            --warning-color: #fd7e14;
+            --danger-color: #dc3545;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+        
+        .navbar-nav .nav-link {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        .navbar-nav .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .user-role {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        /* Main Container */
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        /* Search and Filters */
+        .search-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-tab:hover {
+            color: var(--primary-color);
+        }
+        
+        .filter-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        /* Patient Cards */
+        .patients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .patient-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .patient-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .patient-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .patient-info h4 {
+            margin: 0 0 0.25rem 0;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        .patient-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        
+        .patient-details {
+            margin-bottom: 1rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .detail-label {
+            color: #666;
+        }
+        
+        .detail-value {
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        
+        .patient-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary {
+            background: none;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            background: none;
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            color: white;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--dark-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-description {
+            margin-bottom: 2rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .patients-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .patient-actions {
+                flex-direction: column;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .user-details {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-microscope"></i> SkinX
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-dashboard"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/analysis">
+                            <i class="fas fa-microscope"></i> Analysis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/patients">
+                            <i class="fas fa-users"></i> Patients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reports">
+                            <i class="fas fa-file-medical"></i> Reports
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ user.name[0] }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ user.name }}</div>
+                            <div class="user-role">{{ user.role.title() }}</div>
+                        </div>
+                        <a class="btn btn-outline-primary btn-sm" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Patient Management</h1>
+            <button class="btn btn-primary" onclick="addPatient()">
+                <i class="fas fa-user-plus"></i> Add Patient
+            </button>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="search-section">
+            <div class="search-form">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search patients by name, email, or phone...">
+                <button class="btn btn-primary" onclick="searchPatients()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterPatients('all')">All Patients</button>
+                <button class="filter-tab" onclick="filterPatients('recent')">Recent</button>
+                <button class="filter-tab" onclick="filterPatients('high_risk')">High Risk</button>
+                <button class="filter-tab" onclick="filterPatients('pending')">Pending</button>
+            </div>
+        </div>
+
+        <!-- Patients Grid -->
+        <div class="patients-grid" id="patientsGrid">
+            {% if patients %}
+                {% for patient in patients %}
+                <div class="patient-card" onclick="viewPatient({{ patient.id }})">
+                    <div class="patient-header">
+                        <div class="patient-avatar">
+                            {{ patient.firstName[0] }}{{ patient.lastName[0] }}
+                        </div>
+                        <div class="patient-info">
+                            <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+                            <p>{{ patient.email }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="patient-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value">{{ patient.phone }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Age:</span>
+                            <span class="detail-value">{{ patient.age or 'N/A' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Gender:</span>
+                            <span class="detail-value">{{ patient.gender or 'N/A' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Blood Type:</span>
+                            <span class="detail-value">{{ patient.blood_type or 'N/A' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Visit:</span>
+                            <span class="detail-value">{{ patient.last_visit or 'N/A' }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="patient-actions">
+                        <button class="btn-sm btn-outline-primary" onclick="event.stopPropagation(); viewPatient({{ patient.id }})">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn-sm btn-outline-primary" onclick="event.stopPropagation(); analyzePatient({{ patient.id }})">
+                            <i class="fas fa-microscope"></i> Analyze
+                        </button>
+                        <button class="btn-sm btn-outline-secondary" onclick="event.stopPropagation(); editPatient({{ patient.id }})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="empty-title">No Patients Found</h3>
+                    <p class="empty-description">You haven't added any patients yet. Click the "Add Patient" button to get started.</p>
+                    <button class="btn btn-primary" onclick="addPatient()">
+                        <i class="fas fa-user-plus"></i> Add Your First Patient
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <button class="page-btn" onclick="changePage('prev')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-btn active" onclick="changePage(1)">1</button>
+            <button class="page-btn" onclick="changePage(2)">2</button>
+            <button class="page-btn" onclick="changePage(3)">3</button>
+            <button class="page-btn" onclick="changePage('next')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class PatientManagement {
+            constructor() {
+                this.currentFilter = 'all';
+                this.currentPage = 1;
+                this.patients = [];
+                this.filteredPatients = [];
+                this.initializeEventListeners();
+                this.loadPatients();
+            }
+            
+            initializeEventListeners() {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.searchPatients();
+                        }
+                    });
+                }
+            }
+            
+            async loadPatients() {
+                try {
+                    const response = await fetch('/api/patients');
+                    const data = await response.json();
+                    this.patients = data.patients || [];
+                    this.filteredPatients = [...this.patients];
+                    this.renderPatients();
+                } catch (error) {
+                    console.error('Failed to load patients:', error);
+                    this.showToast('Failed to load patients', 'error');
+                }
+            }
+            
+            searchPatients() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                if (!searchTerm) {
+                    this.filteredPatients = [...this.patients];
+                } else {
+                    this.filteredPatients = this.patients.filter(patient => {
+                        return patient.first_name.toLowerCase().includes(searchTerm) ||
+                               patient.last_name.toLowerCase().includes(searchTerm) ||
+                               patient.email.toLowerCase().includes(searchTerm) ||
+                               (patient.phone && patient.phone.includes(searchTerm));
+                    });
+                }
+                
+                this.renderPatients();
+            }
+            
+            filterPatients(filter) {
+                this.currentFilter = filter;
+                
+                // Update active tab
+                document.querySelectorAll('.filter-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // Apply filter
+                switch (filter) {
+                    case 'all':
+                        this.filteredPatients = [...this.patients];
+                        break;
+                    case 'recent':
+                        this.filteredPatients = this.patients.slice(0, 5);
+                        break;
+                    case 'high_risk':
+                        // For demo purposes, show some patients as high risk
+                        this.filteredPatients = this.patients.slice(0, Math.ceil(this.patients.length / 3));
+                        break;
+                    case 'pending':
+                        // For demo purposes, show some patients as pending
+                        this.filteredPatients = this.patients.slice(Math.ceil(this.patients.length / 2));
+                        break;
+                }
+                
+                this.renderPatients();
+            }
+            
+            renderPatients() {
+                const grid = document.getElementById('patientsGrid');
+                
+                if (this.filteredPatients.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="empty-title">No Patients Found</h3>
+                            <p class="empty-description">No patients match your search criteria.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // For demo purposes, we'll keep the existing server-rendered patients
+                // In production, this would dynamically render based on filtered data
+            }
+            
+            changePage(page) {
+                if (page === 'prev' && this.currentPage > 1) {
+                    this.currentPage--;
+                } else if (page === 'next') {
+                    this.currentPage++;
+                } else if (typeof page === 'number') {
+                    this.currentPage = page;
+                }
+                
+                this.updatePagination();
+                this.loadPatients();
+            }
+            
+            updatePagination() {
+                const pagination = document.getElementById('pagination');
+                const totalPages = Math.ceil(this.filteredPatients.length / 10);
+                
+                // Update pagination buttons
+                document.querySelectorAll('.page-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Set active page
+                const activeBtn = document.querySelector(`.page-btn:nth-child(${this.currentPage + 1})`);
+                if (activeBtn) {
+                    activeBtn.classList.add('active');
+                }
+            }
+            
+            addPatient() {
+                // Navigate to add patient page or open modal
+                window.location.href = '/patients/add';
+            }
+            
+            viewPatient(patientId) {
+                // Navigate to patient details page
+                window.location.href = `/patients/${patientId}`;
+            }
+            
+            analyzePatient(patientId) {
+                // Navigate to analysis page with patient pre-selected
+                window.location.href = `/analysis?patient_id=${patientId}`;
+            }
+            
+            editPatient(patientId) {
+                // Navigate to edit patient page
+                window.location.href = `/patients/${patientId}/edit`;
+            }
+            
+            showToast(message, type = 'info') {
+                // Simple toast notification
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#2196f3'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 9999;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+        
+        // Initialize patient management when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.patientManagement = new PatientManagement();
+            console.log('Patient Management initialized');
+        });
+        
+        // Global functions for button onclick handlers
+        function searchPatients() {
+            window.patientManagement.searchPatients();
+        }
+        
+        function filterPatients(filter) {
+            window.patientManagement.filterPatients(filter);
+        }
+        
+        function changePage(page) {
+            window.patientManagement.changePage(page);
+        }
+        
+        function addPatient() {
+            window.patientManagement.addPatient();
+        }
+        
+        function viewPatient(patientId) {
+            window.patientManagement.viewPatient(patientId);
+        }
+        
+        function analyzePatient(patientId) {
+            window.patientManagement.analyzePatient(patientId);
+        }
+        
+        function editPatient(patientId) {
+            window.patientManagement.editPatient(patientId);
+        }
+    </script>
+</body>
+</html>

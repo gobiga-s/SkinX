@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Analysis - SkinX Medical AI Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/modern.css') }}" rel="stylesheet">
+    
+    <style>
+        .analysis-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .analysis-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .analysis-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .analysis-subtitle {
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .upload-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .upload-area {
+            border: 3px dashed #e0e0e0;
+            border-radius: 15px;
+            padding: 60px 40px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #0066cc;
+            background: #f0f8ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #00a896;
+            background: #e6f7ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 64px;
+            color: #0066cc;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #0066cc 0%, #00a896 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        .preview-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .preview-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-btn:hover {
+            background: #f8f9fa;
+            border-color: #0066cc;
+        }
+        
+        .image-preview {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preprocessing-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .preprocessing-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .option-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .option-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .option-item label {
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0066cc 0%, #00a896 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results-section {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .results-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .confidence-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .disease-name {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066cc, #00a896);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+        
+        .disease-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .treatment-info {
+            background: white;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .treatment-label {
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+        
+        .treatment-text {
+            color: #333;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn.primary {
+            background: #0066cc;
+            color: white;
+            border: none;
+        }
+        
+        .action-btn.primary:hover {
+            background: #0052a3;
+        }
+        
+        .action-btn.secondary {
+            background: white;
+            color: #0066cc;
+            border: 1px solid #0066cc;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .analysis-container {
+                padding: 10px;
+            }
+            
+            .upload-section,
+            .preview-section,
+            .results-section {
+                padding: 20px;
+            }
+            
+            .upload-area {
+                padding: 40px 20px;
+            }
+            
+            .option-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Sidebar Navigation -->
+    <nav class="modern-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <div class="logo-text">
+                    <h3>SkinX</h3>
+                    <span class="logo-subtitle">Medical AI Platform</span>
+                </div>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <h6 class="menu-title">Main Menu</h6>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/dashboard" class="nav-link">
+                            <i class="fas fa-dashboard"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/patients" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="#image-analysis" class="nav-link">
+                            <i class="fas fa-image"></i>
+                            <span>Image Analysis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/analysis/text" class="nav-link">
+                            <i class="fas fa-notes-medical"></i>
+                            <span>Symptom Analysis</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#history" class="nav-link">
+                            <i class="fas fa-history"></i>
+                            <span>Analysis History</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <h6 class="menu-title">Professional Tools</h6>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#analytics" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reports" class="nav-link">
+                            <i class="fas fa-file-medical"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Dr. Professional</div>
+                    <div class="user-role" id="userRole">Healthcare Provider</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navigation Bar -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="mobile-sidebar-toggle" id="mobileSidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb-nav">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Image Analysis</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-bar">
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search..." class="search-input">
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    
+                    <div class="user-menu">
+                        <button class="user-menu-btn" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Analysis Content -->
+        <main class="analysis-container">
+            <div class="analysis-header">
+                <h1 class="analysis-title">Image Analysis</h1>
+                <p class="analysis-subtitle">Upload medical images for AI-powered skin disease analysis</p>
+            </div>
+
+            <!-- Upload Section -->
+            <section class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">
+                        <h3>Upload Medical Image</h3>
+                        <p>Drag and drop or click to browse</p>
+                        <p style="font-size: 14px; color: #999;">Supported: JPG, PNG, GIF, DICOM (Max 50MB)</p>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*,.dcm,.dicom" style="display: none;">
+                    <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                        <i class="fas fa-folder-open"></i> Choose Image
+                    </button>
+                </div>
+            </section>
+
+            <!-- Preview Section -->
+            <section class="preview-section" id="previewSection">
+                <div class="preview-header">
+                    <h3 class="preview-title">Image Preview</h3>
+                    <div class="preview-actions">
+                        <button class="preview-btn" onclick="resetUpload()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="preview-btn" onclick="document.getElementById('imageInput').click()">
+                            <i class="fas fa-exchange-alt"></i> Change Image
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="image-preview">
+                    <img id="previewImage" src="" alt="Medical image">
+                </div>
+                
+                <div class="preprocessing-options">
+                    <h4 class="preprocessing-title">Preprocessing Options</h4>
+                    <div class="option-group">
+                        <div class="option-item">
+                            <input type="checkbox" id="enhanceContrast" checked>
+                            <label for="enhanceContrast">Enhance Contrast</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" id="removeHair" checked>
+                            <label for="removeHair">Hair Removal</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" id="noiseReduction" checked>
+                            <label for="noiseReduction">Noise Reduction</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImage()">
+                    <i class="fas fa-microscope"></i> Analyze Image
+                </button>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <h3 class="results-title">Analysis Results</h3>
+                    <div class="confidence-display" id="confidenceDisplay">0%</div>
+                    <div class="disease-name" id="diseaseName">Loading...</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="disease-details" id="diseaseDetails">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Category:</span>
+                            <span class="detail-value" id="categoryValue">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Severity:</span>
+                            <span class="detail-value" id="severityValue">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Contagious:</span>
+                            <span class="detail-value" id="contagiousValue">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">ICD-10:</span>
+                            <span class="detail-value" id="icd10Value">-</span>
+                        </div>
+                    </div>
+                    <div class="treatment-info">
+                        <div class="treatment-label">Recommended Treatment:</div>
+                        <div class="treatment-text" id="treatmentText">-</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="exportResults()">
+                        <i class="fas fa-download"></i> Export Results
+                    </button>
+                    <button class="action-btn secondary" onclick="shareResults()">
+                        <i class="fas fa-share"></i> Share
+                    </button>
+                    <button class="action-btn secondary" onclick="newAnalysis()">
+                        <i class="fas fa-plus"></i> New Analysis
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class ImageAnalysis {
+            constructor() {
+                this.uploadedImage = null;
+                this.initializeEventListeners();
+                this.loadUserData();
+            }
+            
+            initializeEventListeners() {
+                const uploadArea = document.getElementById('uploadArea');
+                const imageInput = document.getElementById('imageInput');
+                
+                // File input change
+                imageInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.handleImageUpload(file);
+                    }
+                });
+                
+                // Drag and drop
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleImageUpload(files[0]);
+                    }
+                });
+            }
+            
+            loadUserData() {
+                const user = JSON.parse(sessionStorage.getItem('skinx_user') || localStorage.getItem('skinx_user') || '{}');
+                const userName = document.getElementById('userName');
+                const userRole = document.getElementById('userRole');
+                
+                if (userName) userName.textContent = user.name || 'Dr. Professional';
+                if (userRole) userRole.textContent = user.role || 'Healthcare Provider';
+            }
+            
+            handleImageUpload(file) {
+                // Validate file
+                if (!this.validateFile(file)) {
+                    return;
+                }
+                
+                // Read and display image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.displayImage(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            validateFile(file) {
+                // Check file size (50MB limit)
+                if (file.size > 50 * 1024 * 1024) {
+                    alert('File size exceeds 50MB limit');
+                    return false;
+                }
+                
+                // Check file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                const allowedExtensions = ['.dcm', '.dicom'];
+                
+                if (!allowedTypes.includes(file.type) && !allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))) {
+                    alert('Unsupported file format');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            displayImage(imageSrc, file) {
+                const uploadSection = document.getElementById('uploadSection');
+                const previewSection = document.getElementById('previewSection');
+                const previewImage = document.getElementById('previewImage');
+                
+                // Hide upload section, show preview
+                uploadSection.style.display = 'none';
+                previewSection.style.display = 'block';
+                
+                // Set image source
+                previewImage.src = imageSrc;
+                
+                // Store file reference
+                this.uploadedImage = file;
+            }
+            
+            async analyzeImage() {
+                if (!this.uploadedImage) {
+                    alert('Please upload an image first');
+                    return;
+                }
+                
+                const analyzeBtn = document.getElementById('analyzeBtn');
+                const originalText = analyzeBtn.innerHTML;
+                
+                try {
+                    // Disable button and show loading
+                    analyzeBtn.disabled = true;
+                    analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+                    
+                    // Create form data
+                    const formData = new FormData();
+                    formData.append('image', this.uploadedImage);
+                    
+                    // Add preprocessing options
+                    if (document.getElementById('enhanceContrast').checked) {
+                        formData.append('enhance_contrast', 'true');
+                    }
+                    if (document.getElementById('removeHair').checked) {
+                        formData.append('remove_hair', 'true');
+                    }
+                    if (document.getElementById('noiseReduction').checked) {
+                        formData.append('noise_reduction', 'true');
+                    }
+                    
+                    // Make API call
+                    const response = await fetch('/predict_image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.displayResults(result.result);
+                    } else {
+                        throw new Error(result.error || 'Analysis failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    alert('Analysis failed: ' + error.message);
+                } finally {
+                    // Re-enable button
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = originalText;
+                }
+            }
+            
+            displayResults(result) {
+                const previewSection = document.getElementById('previewSection');
+                const resultsSection = document.getElementById('resultsSection');
+                
+                // Hide preview, show results
+                previewSection.style.display = 'none';
+                resultsSection.style.display = 'block';
+                
+                // Update results
+                const confidence = result.confidence || 0;
+                const disease = result.disease || 'Unknown';
+                const diseaseInfo = result.disease_info || {};
+                
+                // Update confidence
+                document.getElementById('confidenceDisplay').textContent = (confidence * 100).toFixed(1) + '%';
+                document.getElementById('diseaseName').textContent = disease;
+                
+                // Animate confidence bar
+                setTimeout(() => {
+                    document.getElementById('confidenceFill').style.width = (confidence * 100) + '%';
+                }, 100);
+                
+                // Update disease details
+                document.getElementById('categoryValue').textContent = diseaseInfo.category || '-';
+                document.getElementById('severityValue').textContent = diseaseInfo.severity || '-';
+                document.getElementById('contagiousValue').textContent = diseaseInfo.contagious ? 'Yes' : 'No';
+                document.getElementById('icd10Value').textContent = diseaseInfo.icd10 || '-';
+                document.getElementById('treatmentText').textContent = diseaseInfo.treatment || 'Consult dermatologist';
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            resetUpload() {
+                const uploadSection = document.getElementById('uploadSection');
+                const previewSection = document.getElementById('previewSection');
+                const resultsSection = document.getElementById('resultsSection');
+                const imageInput = document.getElementById('imageInput');
+                
+                // Reset everything
+                uploadSection.style.display = 'block';
+                previewSection.style.display = 'none';
+                resultsSection.style.display = 'none';
+                
+                imageInput.value = '';
+                this.uploadedImage = null;
+                
+                // Reset confidence bar
+                document.getElementById('confidenceFill').style.width = '0%';
+            }
+            
+            newAnalysis() {
+                this.resetUpload();
+            }
+            
+            exportResults() {
+                alert('Export functionality coming soon');
+            }
+            
+            shareResults() {
+                alert('Share functionality coming soon');
+            }
+        }
+        
+        // Global functions
+        function logout() {
+            sessionStorage.removeItem('skinx_token');
+            sessionStorage.removeItem('skinx_user');
+            localStorage.removeItem('skinx_token');
+            localStorage.removeItem('skinx_user');
+            window.location.href = '/login';
+        }
+        
+        function analyzeImage() {
+            window.imageAnalysis.analyzeImage();
+        }
+        
+        function resetUpload() {
+            window.imageAnalysis.resetUpload();
+        }
+        
+        function exportResults() {
+            window.imageAnalysis.exportResults();
+        }
+        
+        function shareResults() {
+            window.imageAnalysis.shareResults();
+        }
+        
+        function newAnalysis() {
+            window.imageAnalysis.newAnalysis();
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.imageAnalysis = new ImageAnalysis();
+        });
+    </script>
+</body>
+</html>

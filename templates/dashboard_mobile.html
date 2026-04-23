@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-microscope"></i>
+            </div>
+            <h1>Welcome, {{ user.name.split(' ')[0] }}</h1>
+            <p>Role: <span class="role-badge role-{{ user.role }}">{{ user.role }}</span></p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Quick Actions -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </div>
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="switchTab('image')">
+                        <i class="fas fa-camera"></i>
+                        <span>Image Analysis</span>
+                    </div>
+                    <div class="quick-action" onclick="switchTab('symptoms')">
+                        <i class="fas fa-notes-medical"></i>
+                        <span>Symptoms</span>
+                    </div>
+                    <div class="quick-action" onclick="window.location.href='/reports'">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Reports</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Tabs -->
+            <div class="card fade-in">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('image')" id="imageTab">
+                        <i class="fas fa-camera"></i> Image
+                    </button>
+                    <button class="tab" onclick="switchTab('symptoms')" id="symptomsTab">
+                        <i class="fas fa-notes-medical"></i> Symptoms
+                    </button>
+                </div>
+
+                <!-- Image Analysis -->
+                <div id="imageAnalysis">
+                    <div class="upload-area" id="imageUploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <p class="upload-text">Upload Skin Image</p>
+                        <p class="upload-hint">Click or drag & drop</p>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="document.getElementById('imageInput').click()">
+                            <i class="fas fa-folder-open"></i> Choose Image
+                        </button>
+                    </div>
+
+                    <div class="image-preview" id="imagePreview" style="display: none;">
+                        <img src="" alt="Preview" class="preview-img" id="previewImg">
+                        <div class="preview-actions">
+                            <button type="button" class="preview-btn" onclick="removeImage()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="analyzeImageBtn" onclick="analyzeImage()" style="display: none;">
+                        <i class="fas fa-microscope"></i> Predict Disease
+                    </button>
+                </div>
+
+                <!-- Symptom Analysis -->
+                <div id="symptomsAnalysis" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Select Symptoms</label>
+                        <div class="symptom-list">
+                            <div class="symptom-item">
+                                <input type="checkbox" id="itching" value="itching">
+                                <label for="itching">Itching</label>
+                            </div>
+                            <div class="symptom-item">
+                                <input type="checkbox" id="redness" value="redness">
+                                <label for="redness">Redness</label>
+                            </div>
+                            <div class="symptom-item">
+                                <input type="checkbox" id="rash" value="rash">
+                                <label for="rash">Rash</label>
+                            </div>
+                            <div class="symptom-item">
+                                <input type="checkbox" id="swelling" value="swelling">
+                                <label for="swelling">Swelling</label>
+                            </div>
+                            <div class="symptom-item">
+                                <input type="checkbox" id="drySkin" value="drySkin">
+                                <label for="drySkin">Dry Skin</label>
+                            </div>
+                            <div class="symptom-item">
+                                <input type="checkbox" id="pain" value="pain">
+                                <label for="pain">Pain</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Additional Symptoms</label>
+                        <textarea class="form-input" id="additionalSymptoms" rows="3" placeholder="Describe any additional symptoms..."></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="analyzeSymptoms()">
+                        <i class="fas fa-microscope"></i> Predict Disease
+                    </button>
+                </div>
+            </div>
+
+            <!-- Prediction Result -->
+            <div class="result-card fade-in" id="resultCard" style="display: none;">
+                <div class="result-header">
+                    <div class="result-icon">
+                        <i class="fas fa-disease"></i>
+                    </div>
+                    <div class="result-disease">
+                        <h3 id="diseaseName">-</h3>
+                        <span class="confidence-badge" id="confidenceBadge">0% Confidence</span>
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="result-detail">
+                        <span class="detail-label">Risk Level:</span>
+                        <span class="detail-value" id="riskLevel">-</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="detail-label">Severity:</span>
+                        <span class="detail-value" id="severity">-</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="detail-label">Treatment:</span>
+                        <span class="detail-value" id="treatment">-</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="window.location.href='/reports'">
+                        <i class="fas fa-file-medical"></i> View Reports
+                    </button>
+                    <button class="btn btn-outline" onclick="newAnalysis()">
+                        <i class="fas fa-redo"></i> New Analysis
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-history"></i>
+                    Recent Activity
+                </div>
+                <div id="recentActivity">
+                    <p style="color: var(--text-light); font-size: 0.9rem;">No recent analyses</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="/dashboard" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/reports" class="nav-item">
+                <i class="fas fa-file-medical"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Analyzing...</p>
+        </div>
+    </div>
+
+    <script>
+        class MobileDashboard {
+            constructor() {
+                this.uploadedImage = null;
+                this.initializeEventListeners();
+                this.loadRecentActivity();
+            }
+
+            initializeEventListeners() {
+                const imageInput = document.getElementById('imageInput');
+                const imageUploadArea = document.getElementById('imageUploadArea');
+
+                if (imageInput) {
+                    imageInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            this.handleImageUpload(file);
+                        }
+                    });
+                }
+
+                if (imageUploadArea) {
+                    imageUploadArea.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        imageUploadArea.classList.add('dragover');
+                    });
+
+                    imageUploadArea.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        imageUploadArea.classList.remove('dragover');
+                    });
+
+                    imageUploadArea.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        imageUploadArea.classList.remove('dragover');
+                        const file = e.dataTransfer.files[0];
+                        if (file) {
+                            this.handleImageUpload(file);
+                        }
+                    });
+                }
+            }
+
+            handleImageUpload(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imageUploadArea').style.display = 'none';
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('analyzeImageBtn').style.display = 'block';
+                    this.uploadedImage = file;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            async analyzeImage() {
+                if (!this.uploadedImage) {
+                    this.showToast('Please upload an image first', 'error');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('image', this.uploadedImage);
+
+                this.showLoading('Analyzing image...');
+
+                try {
+                    const response = await fetch('/predict_image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.displayResult(result.result);
+                    } else {
+                        throw new Error(result.error || 'Analysis failed');
+                    }
+                } catch (error) {
+                    this.showToast('Analysis failed: ' + error.message, 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            async analyzeSymptoms() {
+                const symptoms = [];
+                const checkboxes = document.querySelectorAll('.symptom-list input[type="checkbox"]:checked');
+                checkboxes.forEach(cb => symptoms.push(cb.value));
+
+                const additionalSymptoms = document.getElementById('additionalSymptoms').value;
+                if (additionalSymptoms) {
+                    symptoms.push(additionalSymptoms);
+                }
+
+                if (symptoms.length === 0) {
+                    this.showToast('Please select at least one symptom', 'error');
+                    return;
+                }
+
+                this.showLoading('Analyzing symptoms...');
+
+                try {
+                    const response = await fetch('/predict_text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            symptoms: symptoms.join(', ')
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.displayResult(result.result);
+                    } else {
+                        throw new Error(result.error || 'Analysis failed');
+                    }
+                } catch (error) {
+                    this.showToast('Analysis failed: ' + error.message, 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+
+            displayResult(result) {
+                document.getElementById('diseaseName').textContent = result.disease;
+                document.getElementById('confidenceBadge').textContent = (result.confidence * 100).toFixed(1) + '% Confidence';
+                
+                const riskLevel = document.getElementById('riskLevel');
+                riskLevel.textContent = result.risk;
+                riskLevel.className = 'detail-value risk-' + result.risk.toLowerCase();
+                
+                document.getElementById('severity').textContent = result.severity;
+                document.getElementById('treatment').textContent = result.treatment;
+                
+                document.getElementById('resultCard').style.display = 'block';
+                document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            newAnalysis() {
+                this.removeImage();
+                document.getElementById('resultCard').style.display = 'none';
+                document.querySelectorAll('.symptom-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+                document.getElementById('additionalSymptoms').value = '';
+            }
+
+            removeImage() {
+                document.getElementById('imageUploadArea').style.display = 'block';
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('analyzeImageBtn').style.display = 'none';
+                document.getElementById('imageInput').value = '';
+                this.uploadedImage = null;
+            }
+
+            async loadRecentActivity() {
+                try {
+                    const response = await fetch('/api/analyses');
+                    const data = await response.json();
+                    
+                    if (data.analyses && data.analyses.length > 0) {
+                        const activityHtml = data.analyses.slice(0, 3).map(analysis => `
+                            <div class="patient-item">
+                                <div class="patient-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <div class="patient-info">
+                                    <div class="patient-name">${analysis.disease_detected}</div>
+                                    <div class="patient-details">${new Date(analysis.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('recentActivity').innerHTML = activityHtml;
+                    }
+                } catch (error) {
+                    console.error('Failed to load recent activity:', error);
+                }
+            }
+
+            showLoading(message) {
+                const overlay = document.getElementById('loadingOverlay');
+                overlay.querySelector('.loading-text').textContent = message;
+                overlay.classList.add('active');
+            }
+
+            hideLoading() {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('imageAnalysis').style.display = tab === 'image' ? 'block' : 'none';
+            document.getElementById('symptomsAnalysis').style.display = tab === 'symptoms' ? 'block' : 'none';
+            
+            document.getElementById('imageTab').classList.toggle('active', tab === 'image');
+            document.getElementById('symptomsTab').classList.toggle('active', tab === 'symptoms');
+        }
+
+        function removeImage() {
+            window.dashboardApp.removeImage();
+        }
+
+        function analyzeImage() {
+            window.dashboardApp.analyzeImage();
+        }
+
+        function analyzeSymptoms() {
+            window.dashboardApp.analyzeSymptoms();
+        }
+
+        function newAnalysis() {
+            window.dashboardApp.newAnalysis();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboardApp = new MobileDashboard();
+        });
+    </script>
+</body>
+</html>

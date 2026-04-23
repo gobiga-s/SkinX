@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkinX Professional Medical AI Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00a896;
+            --success-color: #28a745;
+            --warning-color: #fd7e14;
+            --danger-color: #dc3545;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+        
+        .navbar-nav .nav-link {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        .navbar-nav .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .user-role {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        /* Main Container */
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-stats {
+            display: flex;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .welcome-stat {
+            text-align: center;
+        }
+        
+        .welcome-stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card.success {
+            border-left-color: var(--success-color);
+        }
+        
+        .stat-card.warning {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-card.danger {
+            border-left-color: var(--danger-color);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .stat-icon.success {
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            color: white;
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, var(--warning-color), #ffc107);
+            color: white;
+        }
+        
+        .stat-icon.danger {
+            background: linear-gradient(135deg, var(--danger-color), #c82333);
+            color: white;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .stat-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .stat-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .view-all-btn {
+            background: none;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-all-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            color: inherit;
+        }
+        
+        .action-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem auto;
+        }
+        
+        .action-icon.analysis {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .action-icon.patients {
+            background: linear-gradient(135deg, var(--success-color), #20c997);
+            color: white;
+        }
+        
+        .action-icon.reports {
+            background: linear-gradient(135deg, var(--warning-color), #ffc107);
+            color: white;
+        }
+        
+        .action-icon.settings {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+        
+        .action-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        /* Recent Activity */
+        .activity-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: #e9ecef;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .activity-icon.image {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .activity-icon.text {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .activity-icon.patient {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-details {
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .welcome-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .welcome-stats {
+                gap: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .user-details {
+                text-align: left;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-microscope"></i> SkinX
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard">
+                            <i class="fas fa-dashboard"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/analysis">
+                            <i class="fas fa-microscope"></i> Analysis
+                        </a>
+                    </li>
+                    {% if user.role in ['doctor', 'admin'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/patients">
+                            <i class="fas fa-users"></i> Patients
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reports">
+                            <i class="fas fa-file-medical"></i> Reports
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ user.name[0] }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ user.name }}</div>
+                            <div class="user-role">{{ user.role.title() }}</div>
+                        </div>
+                        <a class="btn btn-outline-primary btn-sm" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+    <!-- Hidden user data for JavaScript -->
+    <script id="userData" type="application/json">
+        {{ user | tojson }}
+    </script>
+        <!-- Welcome Section -->
+        <section class="welcome-section fade-in">
+            <div class="welcome-content">
+                <h1 class="welcome-title">Welcome back, {{ user.name.split(' ')[0] }}!</h1>
+                <p class="welcome-subtitle">Here's your professional medical AI platform overview</p>
+                
+                <div class="welcome-stats">
+                    <div class="welcome-stat">
+                        <div class="welcome-stat-number" id="totalChecks">6,041,619</div>
+                        <div class="welcome-stat-label">Total Checks</div>
+                    </div>
+                    <div class="welcome-stat">
+                        <div class="welcome-stat-number" id="risksIdentified">14.98%</div>
+                        <div class="welcome-stat-label">Risks Identified</div>
+                    </div>
+                    <div class="welcome-stat">
+                        <div class="welcome-stat-number" id="conditionsDetected">55+</div>
+                        <div class="welcome-stat-label">Conditions</div>
+                    </div>
+                    <div class="welcome-stat">
+                        <div class="welcome-stat-number" id="satisfaction">4.8</div>
+                        <div class="welcome-stat-label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid fade-in">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <div class="stat-value">1,842</div>
+                <div class="stat-label">Total Analyses</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    12% this month
+                </div>
+            </div>
+            
+            <div class="stat-card success">
+                <div class="stat-icon success">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">247</div>
+                <div class="stat-label">Active Patients</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    8% this month
+                </div>
+            </div>
+            
+            <div class="stat-card warning">
+                <div class="stat-icon warning">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value">96.1%</div>
+                <div class="stat-label">Accuracy Rate</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    2% improvement
+                </div>
+            </div>
+            
+            <div class="stat-card danger">
+                <div class="stat-icon danger">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">180ms</div>
+                <div class="stat-label">Avg. Processing</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    5% faster
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions fade-in">
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+                <button class="view-all-btn">View All</button>
+            </div>
+            
+            <div class="actions-grid">
+                <a href="/analysis" class="action-card">
+                    <div class="action-icon analysis">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <div class="action-title">New Analysis</div>
+                    <div class="action-description">Start a new skin analysis with AI</div>
+                </a>
+                
+                {% if user.role in ['doctor', 'admin'] %}
+                <a href="/patients" class="action-card">
+                    <div class="action-icon patients">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="action-title">Add Patient</div>
+                    <div class="action-description">Register a new patient</div>
+                </a>
+                {% endif %}
+                
+                <a href="/reports" class="action-card">
+                    <div class="action-icon reports">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <div class="action-title">Generate Report</div>
+                    <div class="action-description">Create medical reports</div>
+                </a>
+                
+                <a href="/settings" class="action-card">
+                    <div class="action-icon settings">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="action-title">Settings</div>
+                    <div class="action-description">Manage your account</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="activity-section fade-in">
+            <div class="section-header">
+                <h2 class="section-title">Recent Activity</h2>
+                <button class="view-all-btn" onclick="viewAllActivity()">View All</button>
+            </div>
+            
+            <div class="activity-list" id="activityList">
+                <div class="activity-item">
+                    <div class="activity-icon image">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Image Analysis Completed</div>
+                        <div class="activity-details">Melanoma detected with 94.2% confidence</div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon text">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Symptom Analysis Completed</div>
+                        <div class="activity-details">Eczema diagnosed with 87.5% confidence</div>
+                        <div class="activity-time">5 hours ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon patient">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New Patient Registered</div>
+                        <div class="activity-details">Sarah Johnson added to patient database</div>
+                        <div class="activity-time">1 day ago</div>
+                    </div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon image">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Image Analysis Completed</div>
+                        <div class="activity-details">Psoriasis identified with 91.8% confidence</div>
+                        <div class="activity-time">2 days ago</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class ProductionDashboard {
+            constructor() {
+                this.initializeEventListeners();
+                this.loadUserData();
+                this.loadStatistics();
+                this.startRealTimeUpdates();
+            }
+            
+            initializeEventListeners() {
+                // Add smooth scrolling for all internal links
+                document.querySelectorAll('a[href^="/"]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        if (link.getAttribute('href') !== window.location.pathname) {
+                            // Let the default navigation happen
+                        }
+                    });
+                });
+            }
+            
+            loadUserData() {
+                // User data is already loaded from template
+                const userElement = document.getElementById('userData');
+                const userData = userElement ? JSON.parse(userElement.textContent) : {};
+                console.log('User loaded:', userData);
+            }
+            
+            async loadStatistics() {
+                try {
+                    const response = await fetch('/api/stats');
+                    const stats = await response.json();
+                    
+                    // Update welcome statistics
+                    this.updateStat('totalChecks', stats.total_checks.toLocaleString());
+                    this.updateStat('risksIdentified', stats.risks_identified);
+                    this.updateStat('conditionsDetected', stats.conditions_detected);
+                    this.updateStat('satisfaction', stats.user_satisfaction);
+                    
+                    console.log('Statistics loaded:', stats);
+                } catch (error) {
+                    console.error('Failed to load statistics:', error);
+                }
+            }
+            
+            updateStat(id, value) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+            
+            startRealTimeUpdates() {
+                // Update statistics every 30 seconds
+                setInterval(() => {
+                    this.loadStatistics();
+                }, 30000);
+                
+                // Add activity updates
+                this.addActivityUpdates();
+            }
+            
+            addActivityUpdates() {
+                // Simulate real-time activity updates
+                const activities = [
+                    {
+                        type: 'image',
+                        title: 'New Image Analysis',
+                        details: 'Acne detected with 85.3% confidence',
+                        time: 'Just now'
+                    },
+                    {
+                        type: 'text',
+                        title: 'Symptom Analysis',
+                        details: 'Rosacea diagnosed with 89.1% confidence',
+                        time: '1 minute ago'
+                    },
+                    {
+                        type: 'patient',
+                        title: 'Patient Follow-up',
+                        details: 'Michael Brown scheduled for follow-up',
+                        time: '3 minutes ago'
+                    }
+                ];
+                
+                // Add new activity every 10 seconds
+                setInterval(() => {
+                    const activity = activities[Math.floor(Math.random() * activities.length)];
+                    this.addActivity(activity);
+                }, 10000);
+            }
+            
+            addActivity(activity) {
+                const activityList = document.getElementById('activityList');
+                if (!activityList) return;
+                
+                const activityItem = document.createElement('div');
+                activityItem.className = 'activity-item fade-in';
+                activityItem.innerHTML = `
+                    <div class="activity-icon ${activity.type}">
+                        <i class="fas fa-${activity.type === 'image' ? 'image' : activity.type === 'text' ? 'notes-medical' : 'user-plus'}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-details">${activity.details}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                `;
+                
+                // Add to top of list
+                activityList.insertBefore(activityItem, activityList.firstChild);
+                
+                // Remove last item if more than 5
+                const items = activityList.querySelectorAll('.activity-item');
+                if (items.length > 5) {
+                    items[items.length - 1].remove();
+                }
+            }
+            
+            viewAllActivity() {
+                // Navigate to activity page
+                window.location.href = '/activity';
+            }
+        }
+        
+        // Initialize dashboard when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new ProductionDashboard();
+            console.log('Production Dashboard initialized');
+        });
+        
+        // Global function for view all activity
+        function viewAllActivity() {
+            window.dashboard.viewAllActivity();
+        }
+    </script>
+</body>
+</html>

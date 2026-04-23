@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/web.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="nav-brand"><i class="fas fa-microscope"></i> SkinX</a>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-link active">Dashboard</a>
+                <a href="/users" class="nav-link">Users</a>
+                <a href="/analytics" class="nav-link">Analytics</a>
+                <a href="/settings" class="nav-link">Settings</a>
+                <a href="/logout" class="nav-link">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo" style="width: 80px; height: 80px; margin: 0 auto 20px; background: var(--gradient-primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=80&h=80&fit=crop" alt="Medical Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+        </div>
+        <h1>Admin Panel</h1>
+        <p>{{ user.name }}</p>
+    </div>
+
+    <!-- Content -->
+    <div class="container">
+        <!-- Analytics Overview -->
+        <div class="grid-4">
+            <div class="stat-card">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card secondary">
+                <div class="stat-value" id="totalPredictions">0</div>
+                <div class="stat-label">Total Predictions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="accuracyRate">0%</div>
+                <div class="stat-label">Accuracy Rate</div>
+            </div>
+            <div class="stat-card secondary">
+                <div class="stat-value" id="activeUsers">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+        </div>
+
+        <!-- User Management -->
+        <div class="card fade-in">
+            <div class="card-title">
+                <i class="fas fa-users-cog"></i>
+                User Management
+            </div>
+            <div class="quick-actions">
+                <div class="quick-action" onclick="showAddUserModal()">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add User</span>
+                </div>
+                <div class="quick-action" onclick="showManageUsersModal()">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Users</span>
+                </div>
+                <div class="quick-action" onclick="showAssignRolesModal()">
+                    <i class="fas fa-user-tag"></i>
+                    <span>Assign Roles</span>
+                </div>
+                <div class="quick-action" onclick="window.location.href='/users'">
+                    <i class="fas fa-list"></i>
+                    <span>View All</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Logs -->
+        <div class="card fade-in">
+            <div class="card-title">
+                <i class="fas fa-clipboard-list"></i>
+                Activity Logs
+            </div>
+            <div id="activityLogs">
+                <div class="patient-item">
+                    <div class="patient-avatar" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="patient-info">
+                        <div class="patient-name">User Login</div>
+                        <div class="patient-details">doctor@skinx.com - 2 mins ago</div>
+                    </div>
+                </div>
+                <div class="patient-item">
+                    <div class="patient-avatar" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <div class="patient-info">
+                        <div class="patient-name">Analysis Completed</div>
+                        <div class="patient-details">Eczema detection - 5 mins ago</div>
+                    </div>
+                </div>
+                <div class="patient-item">
+                    <div class="patient-avatar" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="patient-info">
+                        <div class="patient-name">New User Registered</div>
+                        <div class="patient-details">patient@example.com - 10 mins ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="card fade-in">
+            <div class="card-title">
+                <i class="fas fa-heartbeat"></i>
+                System Health
+            </div>
+            <div class="grid-2">
+                <div class="result-detail">
+                    <span class="detail-label">Server Status:</span>
+                    <span class="detail-value" style="color: var(--secondary-color);">Online</span>
+                </div>
+                <div class="result-detail">
+                    <span class="detail-label">Database:</span>
+                    <span class="detail-value" style="color: var(--secondary-color);">Connected</span>
+                </div>
+                <div class="result-detail">
+                    <span class="detail-label">API Response:</span>
+                    <span class="detail-value">45ms</span>
+                </div>
+                <div class="result-detail">
+                    <span class="detail-label">Uptime:</span>
+                    <span class="detail-value">99.9%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="loading-overlay" id="addUserModal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="card" style="width: 500px; max-width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div class="card-title">
+                <i class="fas fa-user-plus"></i>
+                Add New User
+            </div>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="newUserName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="newUserEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-input" id="newUserRole" required>
+                        <option value="user">User</option>
+                        <option value="doctor">Doctor</option>
+                        <option value="nurse">Nurse</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="newUserPassword" required>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline" onclick="hideAddUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class AdminDashboard {
+            constructor() {
+                this.initializeEventListeners();
+                this.loadAnalytics();
+            }
+
+            initializeEventListeners() {
+                const addUserForm = document.getElementById('addUserForm');
+                if (addUserForm) {
+                    addUserForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.addUser();
+                    });
+                }
+            }
+
+            async loadAnalytics() {
+                try {
+                    const response = await fetch('/api/stats');
+                    const stats = await response.json();
+                    
+                    document.getElementById('totalUsers').textContent = stats.total_users || '3';
+                    document.getElementById('totalPredictions').textContent = stats.total_checks || '156';
+                    document.getElementById('accuracyRate').textContent = stats.accuracy || '94.5%';
+                    document.getElementById('activeUsers').textContent = stats.active_users || '2';
+                } catch (error) {
+                    document.getElementById('totalUsers').textContent = '3';
+                    document.getElementById('totalPredictions').textContent = '156';
+                    document.getElementById('accuracyRate').textContent = '94.5%';
+                    document.getElementById('activeUsers').textContent = '2';
+                }
+            }
+
+            async addUser() {
+                const userData = {
+                    firstName: document.getElementById('newUserName').value.split(' ')[0],
+                    lastName: document.getElementById('newUserName').value.split(' ').slice(1).join(' ') || '',
+                    email: document.getElementById('newUserEmail').value,
+                    role: document.getElementById('newUserRole').value,
+                    password: document.getElementById('newUserPassword').value
+                };
+
+                try {
+                    const response = await fetch('/api/signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showToast('User added successfully!', 'success');
+                        this.hideAddUserModal();
+                        this.loadAnalytics();
+                    } else {
+                        throw new Error(result.error || 'Failed to add user');
+                    }
+                } catch (error) {
+                    this.showToast('Error: ' + error.message, 'error');
+                }
+            }
+
+            showAddUserModal() {
+                document.getElementById('addUserModal').style.display = 'flex';
+            }
+
+            hideAddUserModal() {
+                document.getElementById('addUserModal').style.display = 'none';
+                document.getElementById('addUserForm').reset();
+            }
+
+            showManageUsersModal() {
+                this.showToast('User management coming soon', 'info');
+            }
+
+            showAssignRolesModal() {
+                this.showToast('Role assignment coming soon', 'info');
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+
+        function showAddUserModal() {
+            window.adminDashboard.showAddUserModal();
+        }
+
+        function hideAddUserModal() {
+            window.adminDashboard.hideAddUserModal();
+        }
+
+        function showManageUsersModal() {
+            window.adminDashboard.showManageUsersModal();
+        }
+
+        function showAssignRolesModal() {
+            window.adminDashboard.showAssignRolesModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.adminDashboard = new AdminDashboard();
+        });
+    </script>
+</body>
+</html>

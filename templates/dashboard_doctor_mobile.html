@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <h1>Dr. {{ user.name.split(' ')[0] }}</h1>
+            <p>Dermatologist Dashboard</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ patients|length }}</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-card secondary">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Today's Appointments</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </div>
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="showAddPatientModal()">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Patient</span>
+                    </div>
+                    <div class="quick-action" onclick="window.location.href='/analysis'">
+                        <i class="fas fa-microscope"></i>
+                        <span>Analyze</span>
+                    </div>
+                    <div class="quick-action" onclick="window.location.href='/reports'">
+                        <i class="fas fa-file-medical"></i>
+                        <span>Reports</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient List -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-users"></i>
+                    My Patients
+                </div>
+                
+                {% if patients %}
+                    {% for patient in patients %}
+                    <div class="patient-item" onclick="viewPatient({{ patient.id }})">
+                        <div class="patient-avatar">
+                            {{ patient.first_name[0] }}{{ patient.last_name[0] }}
+                        </div>
+                        <div class="patient-info">
+                            <div class="patient-name">{{ patient.first_name }} {{ patient.last_name }}</div>
+                            <div class="patient-details">{{ patient.email }}</div>
+                        </div>
+                        <button class="patient-action">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 30px; color: var(--text-light);">
+                        <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No patients yet</p>
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="showAddPatientModal()">
+                            <i class="fas fa-user-plus"></i> Add First Patient
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Analyses -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-history"></i>
+                    Recent Analyses
+                </div>
+                <div id="recentAnalyses">
+                    <p style="color: var(--text-light); font-size: 0.9rem;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="/dashboard" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/patients" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Patients</span>
+            </a>
+            <a href="/reports" class="nav-item">
+                <i class="fas fa-file-medical"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div class="loading-overlay" id="addPatientModal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="card" style="width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+            <div class="card-title">
+                <i class="fas fa-user-plus"></i>
+                Add New Patient
+            </div>
+            <form id="addPatientForm">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-input" id="patientFirstName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-input" id="patientLastName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="patientEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="patientPhone" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-input" id="patientDOB" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select class="form-input" id="patientGender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline" onclick="hideAddPatientModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class DoctorDashboard {
+            constructor() {
+                this.initializeEventListeners();
+                this.loadRecentAnalyses();
+            }
+
+            initializeEventListeners() {
+                const addPatientForm = document.getElementById('addPatientForm');
+                if (addPatientForm) {
+                    addPatientForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.addPatient();
+                    });
+                }
+            }
+
+            async addPatient() {
+                const patientData = {
+                    firstName: document.getElementById('patientFirstName').value,
+                    lastName: document.getElementById('patientLastName').value,
+                    email: document.getElementById('patientEmail').value,
+                    phone: document.getElementById('patientPhone').value,
+                    dateOfBirth: document.getElementById('patientDOB').value,
+                    gender: document.getElementById('patientGender').value
+                };
+
+                try {
+                    const response = await fetch('/api/patients', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(patientData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showToast('Patient added successfully!', 'success');
+                        this.hideAddPatientModal();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        throw new Error(result.error || 'Failed to add patient');
+                    }
+                } catch (error) {
+                    this.showToast('Error: ' + error.message, 'error');
+                }
+            }
+
+            async loadRecentAnalyses() {
+                try {
+                    const response = await fetch('/api/analyses');
+                    const data = await response.json();
+                    
+                    if (data.analyses && data.analyses.length > 0) {
+                        const analysesHtml = data.analyses.slice(0, 5).map(analysis => `
+                            <div class="patient-item">
+                                <div class="patient-avatar" style="width: 40px; height: 40px; font-size: 1rem;">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <div class="patient-info">
+                                    <div class="patient-name">${analysis.disease_detected}</div>
+                                    <div class="patient-details">${new Date(analysis.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('recentAnalyses').innerHTML = analysesHtml;
+                    } else {
+                        document.getElementById('recentAnalyses').innerHTML = '<p style="color: var(--text-light); font-size: 0.9rem;">No recent analyses</p>';
+                    }
+                } catch (error) {
+                    document.getElementById('recentAnalyses').innerHTML = '<p style="color: var(--error-color); font-size: 0.9rem;">Failed to load analyses</p>';
+                }
+            }
+
+            showAddPatientModal() {
+                document.getElementById('addPatientModal').style.display = 'flex';
+            }
+
+            hideAddPatientModal() {
+                document.getElementById('addPatientModal').style.display = 'none';
+                document.getElementById('addPatientForm').reset();
+            }
+
+            viewPatient(patientId) {
+                window.location.href = `/patients/${patientId}`;
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+
+        function showAddPatientModal() {
+            window.doctorDashboard.showAddPatientModal();
+        }
+
+        function hideAddPatientModal() {
+            window.doctorDashboard.hideAddPatientModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.doctorDashboard = new DoctorDashboard();
+        });
+    </script>
+</body>
+</html>

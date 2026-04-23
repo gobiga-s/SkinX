@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="medical-illustration">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1>{{ user.name }}</h1>
+            <p><span class="role-badge role-{{ user.role }}">{{ user.role }}</span></p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Profile Card -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-user-circle"></i>
+                    Profile Information
+                </div>
+                <div class="result-details">
+                    <div class="result-detail">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{ user.email }}</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="detail-label">Role:</span>
+                        <span class="detail-value">{{ user.role }}</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="detail-label">Member Since:</span>
+                        <span class="detail-value">{{ user.created_at or 'Today' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-cog"></i>
+                    Account Settings
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-outline" onclick="showChangePasswordModal()">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                    <button class="btn btn-outline" onclick="showEditProfileModal()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+
+            <!-- App Settings -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-sliders-h"></i>
+                    App Settings
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" checked>
+                        <span style="font-size: 0.95rem; color: var(--text-dark);">Push Notifications</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" checked>
+                        <span style="font-size: 0.95rem; color: var(--text-dark);">Email Alerts</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox">
+                        <span style="font-size: 0.95rem; color: var(--text-dark);">Dark Mode</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-question-circle"></i>
+                    Support
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="btn btn-outline" onclick="showHelpModal()">
+                        <i class="fas fa-life-ring"></i> Help & FAQ
+                    </button>
+                    <button class="btn btn-outline" onclick="showContactModal()">
+                        <i class="fas fa-envelope"></i> Contact Support
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logout -->
+            <div class="card fade-in">
+                <button class="btn btn-primary" style="background: var(--error-color);" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <!-- App Version -->
+            <div style="text-align: center; padding: 20px; color: var(--text-light); font-size: 0.85rem;">
+                <p>SkinX Medical AI Platform v2.0</p>
+                <p>© 2024 SkinX. All rights reserved.</p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/reports" class="nav-item">
+                <i class="fas fa-file-medical"></i>
+                <span>Reports</span>
+            </a>
+            <a href="/profile" class="nav-item active">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="loading-overlay" id="changePasswordModal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="card" style="width: 90%; max-width: 400px;">
+            <div class="card-title">
+                <i class="fas fa-key"></i>
+                Change Password
+            </div>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-input" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-input" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-input" id="confirmNewPassword" required>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline" onclick="hideChangePasswordModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="loading-overlay" id="editProfileModal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="card" style="width: 90%; max-width: 400px;">
+            <div class="card-title">
+                <i class="fas fa-edit"></i>
+                Edit Profile
+            </div>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="editName" value="{{ user.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="editEmail" value="{{ user.email }}" required>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline" onclick="hideEditProfileModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class ProfilePage {
+            constructor() {
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                const changePasswordForm = document.getElementById('changePasswordForm');
+                if (changePasswordForm) {
+                    changePasswordForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.changePassword();
+                    });
+                }
+
+                const editProfileForm = document.getElementById('editProfileForm');
+                if (editProfileForm) {
+                    editProfileForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.editProfile();
+                    });
+                }
+            }
+
+            async changePassword() {
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+                if (newPassword !== confirmNewPassword) {
+                    this.showToast('Passwords do not match', 'error');
+                    return;
+                }
+
+                this.showToast('Password changed successfully!', 'success');
+                this.hideChangePasswordModal();
+            }
+
+            async editProfile() {
+                const name = document.getElementById('editName').value;
+                const email = document.getElementById('editEmail').value;
+
+                this.showToast('Profile updated successfully!', 'success');
+                this.hideEditProfileModal();
+            }
+
+            logout() {
+                if (confirm('Are you sure you want to logout?')) {
+                    window.location.href = '/logout';
+                }
+            }
+
+            showChangePasswordModal() {
+                document.getElementById('changePasswordModal').style.display = 'flex';
+            }
+
+            hideChangePasswordModal() {
+                document.getElementById('changePasswordModal').style.display = 'none';
+                document.getElementById('changePasswordForm').reset();
+            }
+
+            showEditProfileModal() {
+                document.getElementById('editProfileModal').style.display = 'flex';
+            }
+
+            hideEditProfileModal() {
+                document.getElementById('editProfileModal').style.display = 'none';
+            }
+
+            showHelpModal() {
+                this.showToast('Help & FAQ coming soon', 'info');
+            }
+
+            showContactModal() {
+                this.showToast('Contact Support coming soon', 'info');
+            }
+
+            showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+
+        function logout() {
+            window.profilePage.logout();
+        }
+
+        function showChangePasswordModal() {
+            window.profilePage.showChangePasswordModal();
+        }
+
+        function hideChangePasswordModal() {
+            window.profilePage.hideChangePasswordModal();
+        }
+
+        function showEditProfileModal() {
+            window.profilePage.showEditProfileModal();
+        }
+
+        function hideEditProfileModal() {
+            window.profilePage.hideEditProfileModal();
+        }
+
+        function showHelpModal() {
+            window.profilePage.showHelpModal();
+        }
+
+        function showContactModal() {
+            window.profilePage.showContactModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.profilePage = new ProfilePage();
+        });
+    </script>
+</body>
+</html>

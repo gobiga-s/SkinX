@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis - SkinX Professional Medical AI Platform</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00a896;
+            --success-color: #28a745;
+            --warning-color: #fd7e14;
+            --danger-color: #dc3545;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+        
+        .navbar-nav .nav-link {
+            color: var(--dark-color) !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        .navbar-nav .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .user-details {
+            text-align: right;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .user-role {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        /* Main Container */
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Analysis Header */
+        .analysis-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .analysis-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .analysis-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        /* Analysis Card */
+        .analysis-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        /* Tabs */
+        .nav-tabs {
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: none;
+        }
+        
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed #e0e0e0;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background: #f8f9ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-description {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-info {
+            font-size: 0.875rem;
+            color: #999;
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        /* Textarea */
+        .symptom-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+        
+        .symptom-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Image Preview */
+        .image-preview {
+            display: none;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-img {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .preview-actions {
+            margin-top: 1.5rem;
+        }
+        
+        /* Results Card */
+        .results-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .confidence-meter {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 1s ease;
+        }
+        
+        .confidence-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        /* Disease Info */
+        .disease-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .disease-info h4 {
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .risk-high {
+            color: var(--danger-color);
+            font-weight: 700;
+        }
+        
+        .risk-medium {
+            color: var(--warning-color);
+            font-weight: 700;
+        }
+        
+        .risk-low {
+            color: var(--success-color);
+            font-weight: 700;
+        }
+        
+        /* Results Actions */
+        .results-actions {
+            text-align: center;
+        }
+        
+        .results-actions .btn {
+            margin: 0 0.5rem;
+        }
+        
+        /* Preprocessing Options */
+        .preprocessing-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .preprocessing-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .preprocessing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .preprocessing-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .preprocessing-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .analysis-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .results-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+            
+            .upload-icon {
+                font-size: 3rem;
+            }
+            
+            .upload-title {
+                font-size: 1.2rem;
+            }
+            
+            .preview-actions .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .results-actions .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .user-details {
+                text-align: left;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Fade in animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-microscope"></i> SkinX
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-dashboard"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/analysis">
+                            <i class="fas fa-microscope"></i> Analysis
+                        </a>
+                    </li>
+                    {% if user.role in ['doctor', 'admin'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/patients">
+                            <i class="fas fa-users"></i> Patients
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reports">
+                            <i class="fas fa-file-medical"></i> Reports
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ user.name[0] }}
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">{{ user.name }}</div>
+                            <div class="user-role">{{ user.role.title() }}</div>
+                        </div>
+                        <a class="btn btn-outline-primary btn-sm" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Analysis Header -->
+        <div class="analysis-header fade-in">
+            <h1 class="analysis-title">Medical AI Analysis</h1>
+            <p class="analysis-subtitle">Upload images or describe symptoms for AI-powered diagnosis</p>
+        </div>
+
+        <!-- Analysis Card -->
+        <div class="analysis-card fade-in">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#image-tab">
+                        <i class="fas fa-image"></i> Image Analysis
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#text-tab">
+                        <i class="fas fa-notes-medical"></i> Symptom Analysis
+                    </a>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Image Analysis Tab -->
+                <div class="tab-pane fade show active" id="image-tab">
+                    <!-- Patient Selection (for doctors) -->
+                    {% if user.role in ['doctor', 'admin'] and patients %}
+                    <div class="form-group">
+                        <label for="patientSelect" class="form-label">Select Patient (Optional)</label>
+                        <select id="patientSelect" class="form-control">
+                            <option value="">No specific patient</option>
+                            {% for patient in patients %}
+                            <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Upload Area -->
+                    <div class="upload-area" id="imageUploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3 class="upload-title">Upload Medical Image</h3>
+                        <p class="upload-description">Drag and drop or click to browse</p>
+                        <p class="upload-info">Supported: JPG, PNG, GIF (Max 50MB)</p>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('imageInput').click()">
+                            <i class="fas fa-folder-open"></i> Choose Image
+                        </button>
+                    </div>
+                    
+                    <!-- Image Preview -->
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImg" class="preview-img" alt="Preview">
+                        <div class="preview-actions">
+                            <button class="btn btn-primary" onclick="analyzeImage()">
+                                <i class="fas fa-microscope"></i> Analyze Image
+                            </button>
+                            <button class="btn btn-secondary" onclick="resetImage()">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Symptom Analysis Tab -->
+                <div class="tab-pane fade" id="text-tab">
+                    <!-- Patient Selection (for doctors) -->
+                    {% if user.role in ['doctor', 'admin'] and patients %}
+                    <div class="form-group">
+                        <label for="patientSelectText" class="form-label">Select Patient (Optional)</label>
+                        <select id="patientSelectText" class="form-control">
+                            <option value="">No specific patient</option>
+                            {% for patient in patients %}
+                            <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="symptomText" class="form-label">Describe Symptoms</label>
+                        <p class="text-muted">Please describe the patient's symptoms in detail</p>
+                        <textarea id="symptomText" class="symptom-textarea" placeholder="Example: Patient has red, itchy patches on arms and legs that appeared 3 days ago. The area is dry and flaky, and the patient reports occasional burning sensations. No fever or systemic symptoms. History of similar episodes in the past."></textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="btn btn-primary" onclick="analyzeSymptoms()">
+                            <i class="fas fa-microscope"></i> Analyze Symptoms
+                        </button>
+                        <button class="btn btn-secondary ms-2" onclick="resetSymptoms()">
+                            <i class="fas fa-redo"></i> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Card -->
+        <div class="results-card" id="resultsCard">
+            <div class="results-header">
+                <h2 class="results-title">Analysis Results</h2>
+                <div class="confidence-meter">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                </div>
+                <p class="confidence-text" id="confidenceText">Confidence: 0%</p>
+            </div>
+            
+            <div class="disease-info">
+                <h4>Disease Information</h4>
+                <div class="info-item">
+                    <span class="info-label">Disease:</span>
+                    <span class="info-value" id="diseaseName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Risk Level:</span>
+                    <span class="info-value" id="riskValue">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Severity:</span>
+                    <span class="info-value" id="severityValue">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Treatment:</span>
+                    <span class="info-value" id="treatmentValue">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Processing Time:</span>
+                    <span class="info-value" id="processingTime">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Analysis ID:</span>
+                    <span class="info-value" id="analysisId">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ICD-10 Code:</span>
+                    <span class="info-value" id="icd10Code">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Category:</span>
+                    <span class="info-value" id="categoryValue">-</span>
+                </div>
+            </div>
+            
+            <div class="results-actions">
+                <button class="btn btn-primary" onclick="exportResults()">
+                    <i class="fas fa-download"></i> Export Results
+                </button>
+                <button class="btn btn-secondary" onclick="newAnalysis()">
+                    <i class="fas fa-plus"></i> New Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class ProductionAnalysis {
+            constructor() {
+                this.uploadedImage = null;
+                this.initializeEventListeners();
+            }
+            
+            initializeEventListeners() {
+                const imageInput = document.getElementById('imageInput');
+                const imageUploadArea = document.getElementById('imageUploadArea');
+                const imagePreview = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('previewImg');
+                
+                if (imageInput) {
+                    imageInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                previewImg.src = e.target.result;
+                                this.uploadedImage = file;
+                                imageUploadArea.style.display = 'none';
+                                imagePreview.style.display = 'block';
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+                
+                // Drag and drop
+                if (imageUploadArea) {
+                    imageUploadArea.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        imageUploadArea.classList.add('dragover');
+                    });
+                    
+                    imageUploadArea.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        imageUploadArea.classList.remove('dragover');
+                    });
+                    
+                    imageUploadArea.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        imageUploadArea.classList.remove('dragover');
+                        
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            const file = files[0];
+                            imageInput.files = files;
+                            
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                previewImg.src = e.target.result;
+                                this.uploadedImage = file;
+                                imageUploadArea.style.display = 'none';
+                                imagePreview.style.display = 'block';
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            }
+            
+            async analyzeImage() {
+                if (!this.uploadedImage) {
+                    this.showToast('Please upload an image first', 'error');
+                    return;
+                }
+                
+                const formData = new FormData();
+                formData.append('image', this.uploadedImage);
+                
+                // Add patient selection if available
+                const patientSelect = document.getElementById('patientSelect');
+                if (patientSelect && patientSelect.value) {
+                    formData.append('patient_id', patientSelect.value);
+                }
+                
+                // Add preprocessing options
+                formData.append('preprocessing', JSON.stringify({
+                    'enhance_contrast': true,
+                    'noise_reduction': true,
+                    'auto_crop': true
+                }));
+                
+                try {
+                    this.showLoading('Analyzing image...');
+                    
+                    const response = await fetch('/predict_image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.displayResults(result.result);
+                    } else {
+                        throw new Error(result.error || 'Analysis failed');
+                    }
+                } catch (error) {
+                    console.error('Image analysis error:', error);
+                    this.showToast('Analysis failed: ' + error.message, 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+            
+            async analyzeSymptoms() {
+                const symptomText = document.getElementById('symptomText').value;
+                
+                if (!symptomText.trim()) {
+                    this.showToast('Please describe symptoms first', 'error');
+                    return;
+                }
+                
+                try {
+                    this.showLoading('Analyzing symptoms...');
+                    
+                    const requestData = {
+                        symptoms: symptomText
+                    };
+                    
+                    // Add patient selection if available
+                    const patientSelectText = document.getElementById('patientSelectText');
+                    if (patientSelectText && patientSelectText.value) {
+                        requestData.patient_id = patientSelectText.value;
+                    }
+                    
+                    const response = await fetch('/predict_text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.displayResults(result.result);
+                    } else {
+                        throw new Error(result.error || 'Analysis failed');
+                    }
+                } catch (error) {
+                    console.error('Symptom analysis error:', error);
+                    this.showToast('Analysis failed: ' + error.message, 'error');
+                } finally {
+                    this.hideLoading();
+                }
+            }
+            
+            displayResults(result) {
+                const resultsCard = document.getElementById('resultsCard');
+                const diseaseName = document.getElementById('diseaseName');
+                const confidenceText = document.getElementById('confidenceText');
+                const confidenceFill = document.getElementById('confidenceFill');
+                const riskValue = document.getElementById('riskValue');
+                const severityValue = document.getElementById('severityValue');
+                const treatmentValue = document.getElementById('treatmentValue');
+                const processingTime = document.getElementById('processingTime');
+                const analysisId = document.getElementById('analysisId');
+                const icd10Code = document.getElementById('icd10Code');
+                const categoryValue = document.getElementById('categoryValue');
+                
+                diseaseName.textContent = result.disease;
+                confidenceText.textContent = `Confidence: ${(result.confidence * 100).toFixed(1)}%`;
+                
+                // Set risk level with appropriate styling
+                riskValue.textContent = result.risk;
+                riskValue.className = 'info-value risk-' + result.risk.toLowerCase();
+                
+                severityValue.textContent = result.severity;
+                treatmentValue.textContent = result.treatment;
+                processingTime.textContent = result.processing_time_ms + 'ms';
+                analysisId.textContent = result.analysis_id || 'N/A';
+                icd10Code.textContent = result.icd10 || 'N/A';
+                categoryValue.textContent = result.category || 'N/A';
+                
+                resultsCard.style.display = 'block';
+                resultsCard.classList.add('fade-in');
+                
+                setTimeout(() => {
+                    confidenceFill.style.width = (result.confidence * 100) + '%';
+                }, 100);
+                
+                resultsCard.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            resetImage() {
+                const imageInput = document.getElementById('imageInput');
+                const imageUploadArea = document.getElementById('imageUploadArea');
+                const imagePreview = document.getElementById('imagePreview');
+                
+                imageInput.value = '';
+                this.uploadedImage = null;
+                imageUploadArea.style.display = 'block';
+                imagePreview.style.display = 'none';
+                document.getElementById('resultsCard').style.display = 'none';
+            }
+            
+            resetSymptoms() {
+                document.getElementById('symptomText').value = '';
+                document.getElementById('resultsCard').style.display = 'none';
+            }
+            
+            newAnalysis() {
+                this.resetImage();
+                this.resetSymptoms();
+            }
+            
+            exportResults() {
+                this.showToast('Export functionality coming soon', 'info');
+            }
+            
+            showLoading(message) {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (!btn.disabled) {
+                        btn.disabled = true;
+                        btn.innerHTML = `<span class="loading"></span> ${message}`;
+                    }
+                });
+            }
+            
+            hideLoading() {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    // Restore original button content
+                    if (btn.innerHTML.includes('loading')) {
+                        if (btn.onclick && btn.onclick.toString().includes('analyzeImage')) {
+                            btn.innerHTML = '<i class="fas fa-microscope"></i> Analyze Image';
+                        } else if (btn.onclick && btn.onclick.toString().includes('analyzeSymptoms')) {
+                            btn.innerHTML = '<i class="fas fa-microscope"></i> Analyze Symptoms';
+                        }
+                    }
+                });
+            }
+            
+            showToast(message, type = 'info') {
+                // Simple toast notification
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'error' ? '#f44336' : type === 'success' ? '#4caf50' : '#2196f3'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    z-index: 9999;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        }
+        
+        // Initialize analysis system when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.analysis = new ProductionAnalysis();
+            console.log('Production Analysis initialized');
+        });
+        
+        // Global functions for button onclick handlers
+        function analyzeImage() {
+            window.analysis.analyzeImage();
+        }
+        
+        function analyzeSymptoms() {
+            window.analysis.analyzeSymptoms();
+        }
+        
+        function resetImage() {
+            window.analysis.resetImage();
+        }
+        
+        function resetSymptoms() {
+            window.analysis.resetSymptoms();
+        }
+        
+        function newAnalysis() {
+            window.analysis.newAnalysis();
+        }
+        
+        function exportResults() {
+            window.analysis.exportResults();
+        }
+    </script>
+</body>
+</html>

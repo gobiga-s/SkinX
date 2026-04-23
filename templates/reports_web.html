@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/web.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="nav-brand"><i class="fas fa-microscope"></i> SkinX</a>
+            <div class="nav-links">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/reports" class="nav-link active">Reports</a>
+                <a href="/profile" class="nav-link">Profile</a>
+                <a href="/logout" class="nav-link">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo" style="width: 80px; height: 80px; margin: 0 auto 20px; background: var(--gradient-primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+            <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=80&h=80&fit=crop" alt="Medical Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+        </div>
+        <h1>Medical Reports</h1>
+        <p>Analysis History</p>
+    </div>
+
+    <!-- Content -->
+    <div class="container">
+        <!-- Filter Options -->
+        <div class="card fade-in">
+            <div class="card-title">
+                <i class="fas fa-filter"></i>
+                Filter Reports
+            </div>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="filterReports('all')">All Reports</button>
+                <button class="btn btn-outline" onclick="filterReports('high')">High Risk</button>
+                <button class="btn btn-outline" onclick="filterReports('medium')">Medium Risk</button>
+                <button class="btn btn-outline" onclick="filterReports('low')">Low Risk</button>
+            </div>
+        </div>
+
+        <!-- Reports Grid -->
+        <div id="reportsList" class="grid-2">
+            <div style="text-align: center; padding: 40px; color: var(--text-light); grid-column: span 2;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                <p style="font-size: 1.1rem;">Loading reports...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Detail Modal -->
+    <div class="loading-overlay" id="reportModal" style="display: none; background: rgba(0,0,0,0.5);">
+        <div class="card" style="width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div class="card-title">
+                <i class="fas fa-file-medical"></i>
+                Report Details
+            </div>
+            <div id="reportDetails">
+                <!-- Report details will be loaded here -->
+            </div>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="closeReportModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        class ReportsPage {
+            constructor() {
+                this.reports = [];
+                this.loadReports();
+            }
+
+            async loadReports() {
+                try {
+                    const response = await fetch('/api/analyses');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    
+                    this.reports = data.analyses || [];
+                    this.displayReports(this.reports);
+                } catch (error) {
+                    console.error('Error loading reports:', error);
+                    document.getElementById('reportsList').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #FF6B6B; grid-column: span 2;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p style="font-size: 1.1rem;">Failed to load reports</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">Please try again later</p>
+                            <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">
+                                <i class="fas fa-refresh"></i> Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            displayReports(reports) {
+                if (reports.length === 0) {
+                    document.getElementById('reportsList').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-light); grid-column: span 2;">
+                            <i class="fas fa-file-medical" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                            <p style="font-size: 1.1rem;">No reports yet</p>
+                            <button class="btn btn-primary" style="margin-top: 20px;" onclick="window.location.href='/dashboard'">
+                                <i class="fas fa-plus"></i> Create Analysis
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const reportsHtml = reports.map(report => `
+                    <div class="card fade-in" onclick="viewReport(${report.id})" style="cursor: pointer;">
+                        <div class="result-header">
+                            <div class="result-icon" style="background: ${this.getRiskColor(report.risk)}">
+                                <i class="fas fa-microscope"></i>
+                            </div>
+                            <div class="result-disease">
+                                <h3>${report.disease_detected}</h3>
+                                <span class="confidence-badge">${(report.confidence * 100).toFixed(1)}% Confidence</span>
+                            </div>
+                        </div>
+                        <div class="result-details">
+                            <div class="result-detail">
+                                <span class="detail-label">Risk Level:</span>
+                                <span class="detail-value risk-${report.risk.toLowerCase()}">${report.risk}</span>
+                            </div>
+                            <div class="result-detail">
+                                <span class="detail-label">Date:</span>
+                                <span class="detail-value">${new Date(report.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div class="result-detail">
+                                <span class="detail-label">Severity:</span>
+                                <span class="detail-value">${report.severity || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('reportsList').innerHTML = reportsHtml;
+            }
+
+            filterReports(filter) {
+                let filteredReports = this.reports;
+                
+                if (filter !== 'all') {
+                    filteredReports = this.reports.filter(report => 
+                        report.risk.toLowerCase() === filter
+                    );
+                }
+                
+                this.displayReports(filteredReports);
+            }
+
+            viewReport(reportId) {
+                const report = this.reports.find(r => r.id === reportId);
+                if (!report) return;
+
+                const reportDetails = `
+                    <div class="result-header">
+                        <div class="result-icon" style="background: ${this.getRiskColor(report.risk)}">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <div class="result-disease">
+                            <h3>${report.disease_detected}</h3>
+                            <span class="confidence-badge">${(report.confidence * 100).toFixed(1)}% Confidence</span>
+                        </div>
+                    </div>
+                    <div class="result-details">
+                        <div class="result-detail">
+                            <span class="detail-label">Risk Level:</span>
+                            <span class="detail-value risk-${report.risk.toLowerCase()}">${report.risk}</span>
+                        </div>
+                        <div class="result-detail">
+                            <span class="detail-label">Severity:</span>
+                            <span class="detail-value">${report.severity || 'N/A'}</span>
+                        </div>
+                        <div class="result-detail">
+                            <span class="detail-label">Treatment:</span>
+                            <span class="detail-value">${report.treatment || 'N/A'}</span>
+                        </div>
+                        <div class="result-detail">
+                            <span class="detail-label">Date:</span>
+                            <span class="detail-value">${new Date(report.created_at).toLocaleString()}</span>
+                        </div>
+                        <div class="result-detail">
+                            <span class="detail-label">Analysis Type:</span>
+                            <span class="detail-value">${report.analysis_type || 'Image'}</span>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('reportDetails').innerHTML = reportDetails;
+                document.getElementById('reportModal').style.display = 'flex';
+            }
+
+            closeReportModal() {
+                document.getElementById('reportModal').style.display = 'none';
+            }
+
+            getRiskColor(risk) {
+                switch(risk?.toLowerCase()) {
+                    case 'high': return 'var(--error-color)';
+                    case 'medium': return 'var(--warning-color)';
+                    case 'low': return 'var(--secondary-color)';
+                    default: return 'var(--primary-color)';
+                }
+            }
+        }
+
+        function filterReports(filter) {
+            window.reportsPage.filterReports(filter);
+        }
+
+        function viewReport(reportId) {
+            window.reportsPage.viewReport(reportId);
+        }
+
+        function closeReportModal() {
+            window.reportsPage.closeReportModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.reportsPage = new ReportsPage();
+        });
+    </script>
+</body>
+</html>

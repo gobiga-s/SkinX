@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SkinX</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="medical-illustration">
+                <i class="fas fa-microscope"></i>
+            </div>
+            <h1>SkinX</h1>
+            <p>AI-Powered Skin Disease Prediction</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Welcome Back
+                </div>
+
+                <div id="errorMessage" class="toast error" style="display: none;"></div>
+                <div id="successMessage" class="toast success" style="display: none;"></div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email or Phone</label>
+                        <input type="text" class="form-input" id="email" placeholder="Enter your email or phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="password" placeholder="Enter your password" required>
+                    </div>
+
+                    <div style="text-align: right; margin-bottom: 20px;">
+                        <a href="#" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #E8ECEF;">
+                    <p style="color: var(--text-light); font-size: 0.9rem;">
+                        Don't have an account?
+                        <a href="/signup" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">
+                            Sign Up
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="card fade-in">
+                <div class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Demo Credentials
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-light);">
+                    <p><strong>Admin:</strong> admin@skinx.com / demo123</p>
+                    <p><strong>Doctor:</strong> doctor@skinx.com / demo123</p>
+                    <p><strong>Patient:</strong> patient@skinx.com / demo123</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="/login" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-file-medical"></i>
+                <span>Reports</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Logging in...</p>
+        </div>
+    </div>
+
+    <script>
+        class MobileLogin {
+            constructor() {
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.handleLogin();
+                    });
+                }
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const loginBtn = document.getElementById('loginBtn');
+                const loadingOverlay = document.getElementById('loadingOverlay');
+
+                if (!email || !password) {
+                    this.showError('Please fill in all fields');
+                    return;
+                }
+
+                // Show loading
+                loadingOverlay.classList.add('active');
+                loginBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.showSuccess('Login successful! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 1000);
+                    } else {
+                        throw new Error(result.error || 'Login failed');
+                    }
+                } catch (error) {
+                    this.showError('Login failed: ' + error.message);
+                } finally {
+                    loadingOverlay.classList.remove('active');
+                    loginBtn.disabled = false;
+                }
+            }
+
+            showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                const successDiv = document.getElementById('successMessage');
+                
+                if (errorDiv) {
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = 'block';
+                }
+                
+                if (successDiv) {
+                    successDiv.style.display = 'none';
+                }
+                
+                setTimeout(() => {
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                }, 3000);
+            }
+
+            showSuccess(message) {
+                const successDiv = document.getElementById('successMessage');
+                const errorDiv = document.getElementById('errorMessage');
+                
+                if (successDiv) {
+                    successDiv.textContent = message;
+                    successDiv.style.display = 'block';
+                }
+                
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+                
+                setTimeout(() => {
+                    if (successDiv) {
+                        successDiv.style.display = 'none';
+                    }
+                }, 3000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new MobileLogin();
+        });
+    </script>
+</body>
+</html>
